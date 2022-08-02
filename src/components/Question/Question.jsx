@@ -3,20 +3,17 @@ import "./Question.css";
 import React from "react";
 
 function Question(props) {
-  const incorrect_answers = props.question.incorrect_answers;
-  const correct_answer = props.question.correct_answer;
-
-  const allAnswers = [correct_answer];
-  for (let i = 0; i < incorrect_answers.length; i++) {
-    allAnswers.push(incorrect_answers[i]);
-  }
-
-  const shurffledAnswers = allAnswers.sort(() => Math.random - 0.5);
-
-  const answers = shurffledAnswers.map((answer) => {
+  const allAnswers = props.question.answers;
+  const answers = allAnswers.map((answer) => {
+    const styles = {
+      "backgroundColor": answer.selected ? "#D6DBF5" : "transparent",
+    }
     return (
-      <div dangerouslySetInnerHTML={{__html: answer}} key={allAnswers.indexOf(answer)} className="answer">
-      </div>
+      <div
+        key={allAnswers.indexOf(answer)}
+        dangerouslySetInnerHTML={{ __html: answer.answer }}
+        className="answer"
+      ></div>
     );
   });
 

@@ -5,3 +5,7 @@
   font-family: sans-serif;
   color: #293264;
 }
+
+body{
+  overflow-x: hidden;
+}

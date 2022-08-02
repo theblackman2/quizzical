@@ -1,0 +1,7 @@
+.questions {
+  padding: 3rem 0;
+  width: 80%;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}

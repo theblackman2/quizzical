@@ -1,5 +1,6 @@
 import React from 'react'
 import Welcome from './../Welcome/Welcome'
+import Questions from '../Questions/Questions'
 import './Game.css'
 
 function Game() {
@@ -17,6 +18,9 @@ function Game() {
         <Welcome
           biginGame={biginGame}
         />
+      )}
+      { playing && (
+        <Questions />
       )}
     </div>
   )

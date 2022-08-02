@@ -23,6 +23,7 @@ function Questions() {
         question: question.question,
         answers: shurffledAnswers.map((answer) => {
           return {
+            id : nanoid(),
             answer: answer,
             selected: false,
           };

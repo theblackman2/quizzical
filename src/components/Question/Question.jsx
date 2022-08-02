@@ -12,7 +12,7 @@ function Question(props) {
         answers: oldQuestion.answers.map((answer) => {
           return answer.id === id
             ? { ...answer, selected: !answer.selected }
-            : { ...answer, selected: false};
+            : { ...answer, selected: false };
         }),
       };
     });

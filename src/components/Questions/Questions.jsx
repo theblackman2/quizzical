@@ -1,6 +1,6 @@
 import "./Questions.css";
-import Question from "../Question/Question";
 import { nanoid } from "nanoid";
+import Bouton from "../Bouton/Bouton";
 
 import React from "react";
 
@@ -20,15 +20,17 @@ function Questions() {
       const shurffledAnswers = allAnswers.sort(() => Math.random() - 0.5);
 
       return {
+        id: nanoid(),
         question: question.question,
         answers: shurffledAnswers.map((answer) => {
           return {
-            id : nanoid(),
+            id: nanoid(),
             answer: answer,
             selected: false,
           };
         }),
         correct_answer: question.correct_answer,
+        selected_answer_id: null,
       };
     });
   };
@@ -39,14 +41,64 @@ function Questions() {
       .then((data) => setQuestions(createQuestions(data.results)));
   }, []);
 
+  const checkAnswers = () => {
+    console.log(allQuestions)
+  }
+
   const questions = allQuestions.map((question) => {
+    const updateQuestion = (questionId, answerId) => {
+      setQuestions((oldQuestions) => {
+        return oldQuestions.map((oldQuestion) => {
+          return oldQuestion.id === questionId
+            ? {
+                ...oldQuestion,
+                answers: oldQuestion.answers.map((answer) => {
+                  return answer.id === answerId
+                    ? { ...answer, selected: true }
+                    : { ...answer, selected: false };
+                }),
+                selected_answer_id: answerId,
+              }
+            : oldQuestion;
+        });
+      });
+    };
+
+    const answers = question.answers.map((answer) => {
+      const styles = {
+        backgroundColor: answer.selected ? "#D6DBF5" : "transparent",
+      };
+      return (
+        <div
+          onClick={() => updateQuestion(question.id, answer.id)}
+          style={styles}
+          key={question.answers.indexOf(answer)}
+          dangerouslySetInnerHTML={{ __html: answer.answer }}
+          className="answer"
+        ></div>
+      );
+    });
+
     const key = nanoid();
-    return <Question question={question} key={key} />;
+    return (
+      <div key={key} className="question">
+        <h2
+          className="question-text"
+          dangerouslySetInnerHTML={{ __html: question.question }}
+        ></h2>
+        <div className="answers">{answers}</div>
+      </div>
+    );
   });
 
-  return <div className="questions">
-    { questions }
-  </div>;
+  return (
+    <div className="questions">
+      {questions}
+      <div className="check">
+        <Bouton text="Check answers" handleClick={() => checkAnswers()} />
+      </div>
+    </div>
+  );
 }
 
 export default Questions;

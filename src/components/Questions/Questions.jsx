@@ -2,6 +2,7 @@ import "./Questions.css";
 import { nanoid } from "nanoid";
 import Bouton from "../Bouton/Bouton";
 import Confetti from "react-confetti";
+import Loading from "../Loading/Loading";
 
 import React from "react";
 
@@ -9,6 +10,7 @@ function Questions(props) {
   const [allQuestions, setAllQuestions] = React.useState([]);
   const [hasFinished, setHasFinished] = React.useState(false);
   const [correctsAnswers, setCorrectsAnswers] = React.useState(0);
+  const [loading, setLoading] = React.useState(true);
 
   const createQuestions = (questions) => {
     return questions.map((question) => {
@@ -42,7 +44,8 @@ function Questions(props) {
   React.useEffect(() => {
     fetch("https://opentdb.com/api.php?amount=5&type=multiple")
       .then((response) => response.json())
-      .then((data) => setAllQuestions(createQuestions(data.results)));
+      .then((data) => setAllQuestions(createQuestions(data.results)))
+      .then(() => setLoading(false));
   }, []);
 
   const checkAnswers = () => {
@@ -138,7 +141,9 @@ function Questions(props) {
     );
   });
 
-  return (
+  return loading ? (
+    <Loading />
+  ) : (
     <div className="questions">
       {questions}
       <div className="check">

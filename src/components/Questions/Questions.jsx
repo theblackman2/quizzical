@@ -1,12 +1,14 @@
 import "./Questions.css";
 import { nanoid } from "nanoid";
 import Bouton from "../Bouton/Bouton";
+import Confetti from "react-confetti";
 
 import React from "react";
 
 function Questions(props) {
   const [allQuestions, setAllQuestions] = React.useState([]);
   const [hasFinished, setHasFinished] = React.useState(false);
+  const [correctsAnswers, setCorrectsAnswers] = React.useState(0);
 
   const createQuestions = (questions) => {
     return questions.map((question) => {
@@ -55,6 +57,11 @@ function Questions(props) {
         selected.length > 0 && selected[0].answer === correct;
       return isSuccessful ? { ...question, successful: true } : question;
     });
+    let corrects = 0;
+    finalQuestions.forEach((question) => {
+      if (question.successful) corrects += 1;
+    });
+    setCorrectsAnswers(corrects);
     setAllQuestions(finalQuestions);
     setHasFinished(true);
   };
@@ -135,6 +142,12 @@ function Questions(props) {
     <div className="questions">
       {questions}
       <div className="check">
+        {hasFinished && (
+          <h3 className="corrests">
+            {correctsAnswers === 5 && <Confetti />}
+            You scored {correctsAnswers}/5 correct answers
+          </h3>
+        )}
         <Bouton
           text={hasFinished ? "Play again" : "Check answers"}
           handleClick={

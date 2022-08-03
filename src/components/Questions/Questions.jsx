@@ -4,8 +4,9 @@ import Bouton from "../Bouton/Bouton";
 
 import React from "react";
 
-function Questions() {
-  const [allQuestions, setQuestions] = React.useState([]);
+function Questions(props) {
+  const [allQuestions, setAllQuestions] = React.useState([]);
+  const [hasFinished, setHasFinished] = React.useState(false);
 
   const createQuestions = (questions) => {
     return questions.map((question) => {
@@ -31,6 +32,7 @@ function Questions() {
         }),
         correct_answer: question.correct_answer,
         selected_answer_id: null,
+        successful: false,
       };
     });
   };
@@ -38,16 +40,28 @@ function Questions() {
   React.useEffect(() => {
     fetch("https://opentdb.com/api.php?amount=5&type=multiple")
       .then((response) => response.json())
-      .then((data) => setQuestions(createQuestions(data.results)));
+      .then((data) => setAllQuestions(createQuestions(data.results)));
   }, []);
 
   const checkAnswers = () => {
-    console.log(allQuestions)
-  }
+    const finalQuestions = allQuestions.map((question) => {
+      const correct = question.answers.filter(
+        (answer) => answer.answer === question.correct_answer
+      )[0].answer;
+      const selected = question.answers.filter(
+        (answer) => answer.id === question.selected_answer_id
+      );
+      const isSuccessful =
+        selected.length > 0 && selected[0].answer === correct;
+      return isSuccessful ? { ...question, successful: true } : question;
+    });
+    setAllQuestions(finalQuestions);
+    setHasFinished(true);
+  };
 
   const questions = allQuestions.map((question) => {
     const updateQuestion = (questionId, answerId) => {
-      setQuestions((oldQuestions) => {
+      setAllQuestions((oldQuestions) => {
         return oldQuestions.map((oldQuestion) => {
           return oldQuestion.id === questionId
             ? {
@@ -64,20 +78,46 @@ function Questions() {
       });
     };
 
-    const answers = question.answers.map((answer) => {
-      const styles = {
-        backgroundColor: answer.selected ? "#D6DBF5" : "transparent",
-      };
-      return (
-        <div
-          onClick={() => updateQuestion(question.id, answer.id)}
-          style={styles}
-          key={question.answers.indexOf(answer)}
-          dangerouslySetInnerHTML={{ __html: answer.answer }}
-          className="answer"
-        ></div>
-      );
-    });
+    const answers = !hasFinished
+      ? question.answers.map((answer) => {
+          const styles = {
+            backgroundColor: !hasFinished
+              ? answer.selected
+                ? "#D6DBF5"
+                : "transparent"
+              : answer.selected
+              ? "#94D7A2"
+              : "transparent",
+          };
+          return (
+            <div
+              onClick={() => updateQuestion(question.id, answer.id)}
+              style={styles}
+              key={question.answers.indexOf(answer)}
+              dangerouslySetInnerHTML={{ __html: answer.answer }}
+              className="answer"
+            ></div>
+          );
+        })
+      : question.answers.map((answer) => {
+          const styles = {
+            backgroundColor: answer.selected
+              ? answer.answer === question.correct_answer
+                ? "#94D7A2"
+                : "#F8BCBC"
+              : answer.answer === question.correct_answer
+              ? "#94D7A2"
+              : "transparent",
+          };
+          return (
+            <div
+              style={styles}
+              key={question.answers.indexOf(answer)}
+              dangerouslySetInnerHTML={{ __html: answer.answer }}
+              className="answer"
+            ></div>
+          );
+        });
 
     const key = nanoid();
     return (
@@ -95,7 +135,12 @@ function Questions() {
     <div className="questions">
       {questions}
       <div className="check">
-        <Bouton text="Check answers" handleClick={() => checkAnswers()} />
+        <Bouton
+          text={hasFinished ? "Play again" : "Check answers"}
+          handleClick={
+            hasFinished ? () => props.playAgain() : () => checkAnswers()
+          }
+        />
       </div>
     </div>
   );

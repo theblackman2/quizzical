@@ -34,7 +34,7 @@ function Game() {
       {!playing && (
         <div className="welcome-section">
           <h1>Quizzical</h1>
-          <p className="welcome-message">Challange yourself with questions based on multiple topics</p>
+          <p className="welcome-message">Challenge yourself with questions based on multiple topics</p>
           <form className="form-data">
             <div className="form-control">
               <label htmlFor="number">Number of questions</label>

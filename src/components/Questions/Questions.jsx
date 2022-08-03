@@ -1,7 +1,6 @@
 import "./Questions.css";
 import { nanoid } from "nanoid";
 import Bouton from "../Bouton/Bouton";
-import Confetti from "react-confetti";
 import Loading from "../Loading/Loading";
 
 import React from "react";
@@ -40,13 +39,21 @@ function Questions(props) {
       };
     });
   };
-
+  const { difficulty, number, category } = props.options;
   React.useEffect(() => {
-    fetch("https://opentdb.com/api.php?amount=5&type=multiple")
+    const url =
+      category === "any" && difficulty === "any"
+        ? `https://opentdb.com/api.php?amount=${number}&type=multiple`
+        : category !== "any" && difficulty !== "any"
+        ? `https://opentdb.com/api.php?amount=${number}&category=${category}&difficulty=${difficulty}&type=multiple`
+        : category !== "any" && difficulty === "any"
+        ? `https://opentdb.com/api.php?amount=${number}&category=${category}&type=multiple`
+        : `https://opentdb.com/api.php?amount=${number}&difficulty=${difficulty}&type=multiple`;
+    fetch(url)
       .then((response) => response.json())
       .then((data) => setAllQuestions(createQuestions(data.results)))
       .then(() => setLoading(false));
-  }, []);
+  }, [category, difficulty, number]);
 
   const checkAnswers = () => {
     const finalQuestions = allQuestions.map((question) => {
@@ -137,6 +144,7 @@ function Questions(props) {
           dangerouslySetInnerHTML={{ __html: question.question }}
         ></h2>
         <div className="answers">{answers}</div>
+        <hr />
       </div>
     );
   });
@@ -149,8 +157,7 @@ function Questions(props) {
       <div className="check">
         {hasFinished && (
           <h3 className="corrests">
-            {correctsAnswers === 5 && <Confetti />}
-            You scored {correctsAnswers}/5 correct answers
+            You scored {correctsAnswers}/{number} correct answers
           </h3>
         )}
         <Bouton
